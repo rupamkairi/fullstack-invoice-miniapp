@@ -7,7 +7,7 @@ import InvoiceDate from "./InvoiceDate";
 import CustomerName from "./CustomerName";
 import SearchProduct from "./SearchProduct";
 import PaymentMode from "./PaymentMode";
-import { Grid } from "@mui/material";
+import { Alert, Box, Grid, Typography } from "@mui/material";
 import { Container } from "@mui/system";
 import axios from "axios";
 
@@ -29,8 +29,39 @@ export default function InvoiceForm() {
           products: [],
           payments: [],
         }}
-        onSubmit={(values, { resetForm }) => {
+        validateOnMount={false}
+        validateOnChange={false}
+        validateOnBlur={true}
+        validate={(values) => {
+          const errors: any = {};
+
+          if (!values.invoiceNo) {
+            errors.invoiceNo = "Invoice No. is Required.";
+          } else if (parseInt(values.invoiceNo) === NaN) {
+            errors.invoiceNo = "Only Numeric Values accepted for Invoice No.";
+          }
+
+          if (!values.invoiceDate) {
+            errors.invoiceDate = "Invoice Date is Required.";
+          }
+
+          if (!values.customer.name) {
+            errors.customer = "Customer Name Required.";
+          }
+
+          if (!values.products.length) {
+            errors.products = "Add atleast One Product.";
+          }
+
+          if (!values.payments.length) {
+            errors.payment = "Add atleast One Payment Mode.";
+          }
+
+          return errors;
+        }}
+        onSubmit={async (values, { resetForm, validateForm }) => {
           // alert(JSON.stringify(values, null, 2));
+          console.log(await validateForm(values));
           console.log(JSON.parse(JSON.stringify(values)));
           axios.post("http://localhost:4000/", values).then((res) => {
             console.log(res);
@@ -40,31 +71,44 @@ export default function InvoiceForm() {
           });
         }}
       >
-        <Container>
-          <Form>
-            <Grid container gap={2}>
+        {({ errors }) => (
+          <Container>
+            {Object.keys(errors).length > 0 && (
+              <Box mb={4}>
+                <Alert severity="error">
+                  {Object.keys(errors).map((key) => (
+                    <Typography color="error" variant="body2" key={key}>
+                      {errors[key]}
+                    </Typography>
+                  ))}
+                </Alert>
+              </Box>
+            )}
+            <Form>
               <Grid container gap={2}>
-                <Grid item xs={2}>
-                  <TextBox
-                    name="invoiceNo"
-                    label="Invoice No"
-                    required={true}
-                  />
+                <Grid container gap={2}>
+                  <Grid item xs={2}>
+                    <TextBox
+                      name="invoiceNo"
+                      label="Invoice No"
+                      required={true}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <InvoiceDate />
+                  </Grid>
                 </Grid>
-                <Grid item xs={4}>
-                  <InvoiceDate />
-                </Grid>
+
+                <CustomerName />
+
+                <SearchProduct />
+
+                <PaymentMode />
               </Grid>
-
-              <CustomerName />
-
-              <SearchProduct />
-
-              <PaymentMode />
-            </Grid>
-            <InvoiceSubmit />
-          </Form>
-        </Container>
+              <InvoiceSubmit />
+            </Form>
+          </Container>
+        )}
       </Formik>
     </div>
   );

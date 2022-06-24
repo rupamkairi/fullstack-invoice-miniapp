@@ -83,7 +83,7 @@ export default function SearchProduct() {
           }}
           getOptionLabel={(option) => option.name}
           renderInput={(params) => (
-            <TextField {...params} label="Product" value={value} required />
+            <TextField {...params} label="Product" value={value} />
           )}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
@@ -93,7 +93,13 @@ export default function SearchProduct() {
         />
       </Grid>
       {/* <Grid container item>
-        <pre>{JSON.stringify(values.products, null, 2)}</pre>
+        <pre>
+          {JSON.stringify(
+            { prods: values.products, len: values.products.length },
+            null,
+            2
+          )}
+        </pre>
       </Grid> */}
 
       <Grid container>

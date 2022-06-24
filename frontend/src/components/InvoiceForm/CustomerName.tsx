@@ -59,9 +59,7 @@ export default function CustomerName() {
         renderOption={(props, option) => (
           <li {...props}>{option.computedInputValue ?? option.name}</li>
         )}
-        renderInput={(params) => (
-          <TextField {...params} label="Customer" required />
-        )}
+        renderInput={(params) => <TextField {...params} label="Customer" />}
         selectOnFocus
         clearOnBlur
         handleHomeEndKeys
